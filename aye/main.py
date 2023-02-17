@@ -1,7 +1,7 @@
 import pathlib
 
 from lexer import Lexer
-from syntax_parser import Parser
+from aye_parser import Parser
 from codegen import CodeGen
 
 

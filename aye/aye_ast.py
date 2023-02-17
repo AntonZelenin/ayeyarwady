@@ -1,4 +1,4 @@
-from aye import aye_types
+import aye.types
 from llvmlite import ir
 
 
@@ -9,7 +9,7 @@ class Number:
         self.value = value
 
     def eval(self):
-        return ir.Constant(aye_types.INT, int(self.value))
+        return ir.Constant(aye.types.INT, int(self.value))
 
 
 class BinaryOp:
@@ -41,7 +41,7 @@ class Print:
         value = self.value.eval()
 
         # Declare argument list
-        voidptr_ty = aye_types.INT.as_pointer()
+        voidptr_ty = aye.types.INT.as_pointer()
         fmt = "%i \n\0"
         c_fmt = ir.Constant(
             ir.ArrayType(ir.IntType(8), len(fmt)),
