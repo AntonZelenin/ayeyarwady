@@ -1,0 +1,18 @@
+fn generate_hello_string(name str) str {
+    return "Hello {name}!"
+}
+
+pub fn main() {
+    name := "World"
+    const hello_string_1 str = generate_hello_string(name)
+    print(hello_string)
+
+    name = "Anton"
+    var_hello_str := generate_hello_string(name)
+    print(var_hello_str)
+
+    var nullable str? = null
+    if nullable != null {
+        print(nullable)
+    }
+}
