@@ -1,11 +1,12 @@
 import pathlib
+
 from lexer import Lexer
 from syntax_parser import Parser
 from codegen import CodeGen
 
 
 def main():
-    text_input = pathlib.Path("code_examples/input.aye").read_text()
+    text_input = pathlib.Path('code_examples/input.aye').read_text()
 
     lexer = Lexer().get_lexer()
     tokens = lexer.lex(text_input)
