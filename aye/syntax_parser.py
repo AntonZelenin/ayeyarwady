@@ -1,7 +1,7 @@
 import tokens as t
 
 from rply import ParserGenerator
-from my_ast import Number, Sum, Sub, Print
+from aye.aast import Number, Sum, Sub, Print
 
 
 class Parser:

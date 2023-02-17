@@ -1,0 +1,4 @@
+aye~=1.0.0
+llvmlite~=0.38.0
+pathlib~=1.0.1
+rply~=0.7.7
