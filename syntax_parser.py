@@ -6,7 +6,10 @@ from my_ast import Number, Sum, Sub, Print
 
 class Parser:
     def __init__(self, module, builder, printf):
-        self.pg = ParserGenerator(t.ALL_TOKENS)
+        self.pg = ParserGenerator(
+            t.ALL_TOKENS,
+            precedence=[("left", [t.SUM, t.SUB])],
+        )
         self.module = module
         self.builder = builder
         self.printf = printf
@@ -22,9 +25,9 @@ class Parser:
             left = p[0]
             right = p[2]
             operator = p[1]
-            if operator.gettokentype() == 'SUM':
+            if operator.gettokentype() == t.SUM:
                 return Sum(self.builder, self.module, left, right)
-            elif operator.gettokentype() == 'SUB':
+            elif operator.gettokentype() == t.SUB:
                 return Sub(self.builder, self.module, left, right)
 
         @self.pg.production('expression : NUMBER')

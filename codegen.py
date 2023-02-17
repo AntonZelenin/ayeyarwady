@@ -1,3 +1,5 @@
+import my_types
+
 from llvmlite import ir, binding
 
 
@@ -33,8 +35,8 @@ class CodeGen:
         self.engine = engine
 
     def _declare_print_function(self):
-        voidptr_ty = ir.IntType(8).as_pointer()
-        printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
+        voidptr_ty = my_types.INT.as_pointer()
+        printf_ty = ir.FunctionType(my_types.INT, [voidptr_ty], var_arg=True)
         printf = ir.Function(self.module, printf_ty, name="printf")
         self.printf = printf
 

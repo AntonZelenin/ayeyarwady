@@ -1,3 +1,5 @@
+import my_types
+
 from llvmlite import ir
 
 
@@ -8,7 +10,7 @@ class Number:
         self.value = value
 
     def eval(self):
-        return ir.Constant(ir.IntType(8), int(self.value))
+        return ir.Constant(my_types.INT, int(self.value))
 
 
 class BinaryOp:
@@ -40,10 +42,12 @@ class Print:
         value = self.value.eval()
 
         # Declare argument list
-        voidptr_ty = ir.IntType(8).as_pointer()
+        voidptr_ty = my_types.INT.as_pointer()
         fmt = "%i \n\0"
-        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)),
-                            bytearray(fmt.encode("utf8")))
+        c_fmt = ir.Constant(
+            ir.ArrayType(ir.IntType(8), len(fmt)),
+            bytearray(fmt.encode("utf8"))
+        )
         global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
         global_fmt.linkage = 'internal'
         global_fmt.global_constant = True

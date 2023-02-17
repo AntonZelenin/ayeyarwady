@@ -13,8 +13,16 @@ LLC
 
 GCC
 
-Run:
-1. `python3 main.py`
-2. `llc -filetype=obj build/output.ll`
-3. `gcc build/output.o -o build/output`
-4. `./build/output`
+To run:
+
+```bash
+    python3 main.py
+    llc -filetype=obj build/output.ll
+    gcc build/output.o -o build/output
+    ./build/output
+```
+
+Or simply 
+```bash
+./run.sh
+```
