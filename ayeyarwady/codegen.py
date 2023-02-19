@@ -1,4 +1,4 @@
-import aye.types
+import ayeyarwady.types as aye_types
 
 from llvmlite import ir, binding
 
@@ -35,8 +35,8 @@ class CodeGen:
         self.engine = engine
 
     def _declare_print_function(self):
-        voidptr_ty = aye.types.INT.as_pointer()
-        printf_ty = ir.FunctionType(aye.types.INT, [voidptr_ty], var_arg=True)
+        voidptr_ty = aye_types.FLOAT.as_pointer()
+        printf_ty = ir.FunctionType(aye_types.FLOAT, [voidptr_ty], var_arg=True)
         printf = ir.Function(self.module, printf_ty, name="printf")
         self.printf = printf
 
