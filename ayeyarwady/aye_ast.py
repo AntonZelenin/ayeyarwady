@@ -4,6 +4,15 @@ from abc import abstractmethod, ABC
 from llvmlite import ir
 
 
+class Program:
+    def __init__(self, statements: list):
+        self.statements = statements
+
+    def eval(self):
+        for statement in self.statements:
+            statement.eval()
+
+
 class Type(ABC):
     def __init__(self, builder, module, value):
         self.builder = builder
@@ -68,7 +77,8 @@ class Div(BinaryOp):
 
 
 class Print:
-    _functions_cache = {}
+    _typed_functions_cache = {}
+    _global_fmt_cache = {}
 
     def __init__(self, builder, module, value):
         self.builder = builder
@@ -77,39 +87,45 @@ class Print:
 
     def eval(self):
         value = self.value.eval()
-
-        # Declare argument list
-        fmt = f'{_get_c_format(value.type)} \n\0'
-        c_fmt = ir.Constant(
-            ir.ArrayType(aye_types.INT8, len(fmt)),
-            bytearray(fmt.encode('utf8'))
+        fmt_arg = self.builder.bitcast(
+            self.get_global_fmt(value.type),
+            value.type.as_pointer(),
         )
-        global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name='fstr')
-        global_fmt.linkage = 'internal'
-        global_fmt.global_constant = True
-        global_fmt.initializer = c_fmt
-        fmt_arg = self.builder.bitcast(global_fmt, value.type.as_pointer())
 
         self.builder.call(self.get_print_function(value.type), [fmt_arg, value])
 
     def get_print_function(self, type_):
-        NAME = "printf"
-        if NAME not in self._functions_cache:
-            self._functions_cache[NAME] = {}
-        if type_ not in self._functions_cache[NAME]:
-            self._declare_print_function(NAME, type_)
-        return self._functions_cache[NAME][type_]
+        if type_ not in self._typed_functions_cache:
+            self._declare_print_function(type_)
+        return self._typed_functions_cache[type_]
 
-    def _declare_print_function(self, name, type_):
+    def _declare_print_function(self, type_):
         voidptr_ty = type_.as_pointer()
         printf_ty = ir.FunctionType(aye_types.DOUBLE, [voidptr_ty], var_arg=True)
-        printf = ir.Function(self.module, printf_ty, name=name)
-        self._functions_cache[name][type_] = printf
+        self._typed_functions_cache[type_] = ir.Function(self.module, printf_ty, name='printf')
+
+    def get_global_fmt(self, type_):
+        if type_ not in self._global_fmt_cache:
+            self._declare_global_fmt(type_)
+        return self._global_fmt_cache[type_]
+
+    def _declare_global_fmt(self, type_):
+        fmt = f'{_get_c_format(type_)} \n\0'
+        c_fmt = ir.Constant(
+            ir.ArrayType(aye_types.INT8, len(fmt)),
+            bytearray(fmt.encode('utf8'))
+        )
+        global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name=f'fstr_{type_}')
+        global_fmt.linkage = 'internal'
+        global_fmt.global_constant = True
+        global_fmt.initializer = c_fmt
+
+        self._global_fmt_cache[type_] = global_fmt
 
 
 def _get_c_format(type_):
     if isinstance(type_, ir.IntType):
         return '%i'
     elif isinstance(type_, ir.DoubleType):
-        return '%f'
+        return '%lf'
     raise ValueError(f'Unsupported type: {type}')

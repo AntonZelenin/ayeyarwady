@@ -8,14 +8,22 @@ class Parser:
     def __init__(self, module, builder):
         self.pg = ParserGenerator(
             t.ALL_TOKENS,
-            precedence=[("left", [t.SUM, t.SUB])],
+            precedence=[
+                ("left", [t.SUM, t.SUB]),
+                ("left", [t.DIV, t.MUL]),
+            ],
         )
         self.module = module
         self.builder = builder
 
     def parse(self):
-        @self.pg.production(f'program : {t.PRINT} OPEN_PAREN expression CLOSE_PAREN')
+        @self.pg.production('program : statement')
+        @self.pg.production('program : program statement')
         def program(p):
+            return aye_ast.Program(p)
+
+        @self.pg.production(f'statement : {t.PRINT} OPEN_PAREN expression CLOSE_PAREN')
+        def printf(p):
             return aye_ast.Print(self.builder, self.module, p[2])
 
         @self.pg.production(f'expression : expression {t.SUM} expression')
