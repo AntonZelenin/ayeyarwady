@@ -45,9 +45,9 @@ class Parser:
         def integer(p):
             return aye_ast.I32(self.builder, self.module, p[0].value)
 
-        @self.pg.production(f'expression : {t.FLOAT}')
-        def float_(p):
-            return aye_ast.Float(self.builder, self.module, p[0].value)
+        @self.pg.production(f'expression : {t.DOUBLE}')
+        def double(p):
+            return aye_ast.Double(self.builder, self.module, p[0].value)
 
         @self.pg.error
         def error_handle(token):

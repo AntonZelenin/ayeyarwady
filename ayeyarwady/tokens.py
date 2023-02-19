@@ -1,6 +1,6 @@
 # Types
 INTEGER = 'INTEGER'
-FLOAT = 'FLOAT'
+DOUBLE = 'DOUBLE'
 
 # Keywords
 PRINT = 'PRINT'

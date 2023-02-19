@@ -35,8 +35,8 @@ class CodeGen:
         self.engine = engine
 
     def _declare_print_function(self):
-        voidptr_ty = aye_types.FLOAT.as_pointer()
-        printf_ty = ir.FunctionType(aye_types.FLOAT, [voidptr_ty], var_arg=True)
+        voidptr_ty = aye_types.DOUBLE.as_pointer()
+        printf_ty = ir.FunctionType(aye_types.DOUBLE, [voidptr_ty], var_arg=True)
         printf = ir.Function(self.module, printf_ty, name="printf")
         self.printf = printf
 

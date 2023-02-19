@@ -1,3 +1,5 @@
+from llvmlite.ir import DoubleType
+
 import ayeyarwady.types as aye_types
 
 from abc import abstractmethod, ABC
@@ -22,9 +24,9 @@ class I32(Integer):
         return ir.Constant(aye_types.INT32, int(self.value))
 
 
-class Float(Type):
+class Double(Type):
     def eval(self):
-        return ir.Constant(aye_types.FLOAT, float(self.value))
+        return ir.Constant(aye_types.DOUBLE, float(self.value))
 
 
 class BinaryOp:
@@ -37,20 +39,24 @@ class BinaryOp:
 
 class Sum(BinaryOp):
     def eval(self):
-        if isinstance(self.left, Integer) and isinstance(self.right, Integer):
-            return self.builder.add(self.left.eval(), self.right.eval())
-        elif isinstance(self.left, Float) and isinstance(self.right, Float):
-            return self.builder.fadd(self.left.eval(), self.right.eval())
-        raise ValueError(f'Unsupported operator types: {type(self.left)} {type(self.right)}')
+        left = self.left.eval()
+        right = self.right.eval()
+        if isinstance(left.type, Integer) and isinstance(right.type, Integer):
+            return self.builder.add(left, right)
+        elif isinstance(left.type, DoubleType) and isinstance(right.type, DoubleType):
+            return self.builder.fadd(left, right)
+        raise ValueError(f'Sum unsupported operator types: {type(self.left)} {type(self.right)}')
 
 
 class Sub(BinaryOp):
     def eval(self):
-        if isinstance(self.left, Integer) and isinstance(self.right, Integer):
-            return self.builder.sub(self.left.eval(), self.right.eval())
-        elif isinstance(self.left, Float) and isinstance(self.right, Float):
-            return self.builder.fsub(self.left.eval(), self.right.eval())
-        raise ValueError(f'Unsupported operator types: {type(self.left)} {type(self.right)}')
+        left = self.left.eval()
+        right = self.right.eval()
+        if isinstance(left.type, Integer) and isinstance(right.type, Integer):
+            return self.builder.sub(left, right)
+        elif isinstance(left.type, DoubleType) and isinstance(right.type, DoubleType):
+            return self.builder.fsub(left, right)
+        raise ValueError(f'Subtraction unsupported operator types: {type(self.left)} {type(self.right)}')
 
 
 class Mul(BinaryOp):
@@ -74,7 +80,7 @@ class Print:
         value = self.value.eval()
 
         # Declare argument list
-        voidptr_ty = aye_types.FLOAT.as_pointer()
+        voidptr_ty = aye_types.DOUBLE.as_pointer()
         fmt = "%f \n\0"
         c_fmt = ir.Constant(
             ir.ArrayType(aye_types.INT8, len(fmt)),
