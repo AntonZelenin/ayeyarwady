@@ -1,5 +1,3 @@
-import ayeyarwady.types as aye_types
-
 from llvmlite import ir, binding
 
 
@@ -11,7 +9,6 @@ class CodeGen:
         self.binding.initialize_native_asmprinter()
         self._config_llvm()
         self._create_execution_engine()
-        self._declare_print_function()
 
     def _config_llvm(self):
         self.module = ir.Module(name=__file__)
@@ -33,12 +30,6 @@ class CodeGen:
         backing_mod = binding.parse_assembly("")
         engine = binding.create_mcjit_compiler(backing_mod, target_machine)
         self.engine = engine
-
-    def _declare_print_function(self):
-        voidptr_ty = aye_types.DOUBLE.as_pointer()
-        printf_ty = ir.FunctionType(aye_types.DOUBLE, [voidptr_ty], var_arg=True)
-        printf = ir.Function(self.module, printf_ty, name="printf")
-        self.printf = printf
 
     def _compile_ir(self):
         """

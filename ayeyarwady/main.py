@@ -18,9 +18,8 @@ def main(file: str = None):
 
     module = codegen.module
     builder = codegen.builder
-    printf = codegen.printf
 
-    pg = Parser(module, builder, printf)
+    pg = Parser(module, builder)
     pg.parse()
     parser_ = pg.get_parser()
     parser_.parse(tokens).eval()

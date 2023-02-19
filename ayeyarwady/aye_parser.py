@@ -5,19 +5,18 @@ from rply import ParserGenerator
 
 
 class Parser:
-    def __init__(self, module, builder, printf):
+    def __init__(self, module, builder):
         self.pg = ParserGenerator(
             t.ALL_TOKENS,
             precedence=[("left", [t.SUM, t.SUB])],
         )
         self.module = module
         self.builder = builder
-        self.printf = printf
 
     def parse(self):
         @self.pg.production(f'program : {t.PRINT} OPEN_PAREN expression CLOSE_PAREN')
         def program(p):
-            return aye_ast.Print(self.builder, self.module, self.printf, p[2])
+            return aye_ast.Print(self.builder, self.module, p[2])
 
         @self.pg.production(f'expression : expression {t.SUM} expression')
         @self.pg.production(f'expression : expression {t.SUB} expression')
