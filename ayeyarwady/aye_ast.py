@@ -36,6 +36,11 @@ class Double(Type):
         return ir.Constant(aye_types.DOUBLE, float(self.value))
 
 
+class String(Type):
+    def eval(self):
+        return ir.Constant(aye_types.STRING(len(self.value)), str(self.value))
+
+
 class BinaryOp:
     def __init__(self, builder, module, left, right):
         self.builder = builder
@@ -48,7 +53,7 @@ class Sum(BinaryOp):
     def eval(self):
         left = self.left.eval()
         right = self.right.eval()
-        if isinstance(left.type, Integer) and isinstance(right.type, Integer):
+        if isinstance(left.type, ir.IntType) and isinstance(right.type, ir.IntType):
             return self.builder.add(left, right)
         elif isinstance(left.type, ir.DoubleType) and isinstance(right.type, ir.DoubleType):
             return self.builder.fadd(left, right)
@@ -77,34 +82,23 @@ class Div(BinaryOp):
 
 
 class Print:
-    _typed_functions_cache = {}
     _global_fmt_cache = {}
 
-    def __init__(self, builder, module, value):
+    def __init__(self, builder, module, value, printf):
         self.builder = builder
         self.module = module
         self.value = value
+        self.printf = printf
 
     def eval(self):
         value = self.value.eval()
         fmt_arg = self.builder.bitcast(
-            self.get_global_fmt(value.type),
+            self._get_global_fmt(value.type),
             value.type.as_pointer(),
         )
+        self.builder.call(self.printf, [fmt_arg, value])
 
-        self.builder.call(self.get_print_function(value.type), [fmt_arg, value])
-
-    def get_print_function(self, type_):
-        if type_ not in self._typed_functions_cache:
-            self._declare_print_function(type_)
-        return self._typed_functions_cache[type_]
-
-    def _declare_print_function(self, type_):
-        voidptr_ty = type_.as_pointer()
-        printf_ty = ir.FunctionType(aye_types.DOUBLE, [voidptr_ty], var_arg=True)
-        self._typed_functions_cache[type_] = ir.Function(self.module, printf_ty, name='printf')
-
-    def get_global_fmt(self, type_):
+    def _get_global_fmt(self, type_):
         if type_ not in self._global_fmt_cache:
             self._declare_global_fmt(type_)
         return self._global_fmt_cache[type_]

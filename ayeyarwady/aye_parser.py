@@ -1,6 +1,8 @@
 import tokens as t
 import aye_ast
+import ayeyarwady.types as aye_types
 
+from llvmlite import ir
 from rply import ParserGenerator
 
 
@@ -15,6 +17,14 @@ class Parser:
         )
         self.module = module
         self.builder = builder
+        self.printf = self._get_print_function()
+
+    def _get_print_function(self):
+        return ir.Function(
+            self.module,
+            ir.FunctionType(aye_types.INT8, [], var_arg=True),
+            name='printf',
+        )
 
     def parse(self):
         @self.pg.production('program : statement')
@@ -24,7 +34,7 @@ class Parser:
 
         @self.pg.production(f'statement : {t.PRINT} OPEN_PAREN expression CLOSE_PAREN')
         def printf(p):
-            return aye_ast.Print(self.builder, self.module, p[2])
+            return aye_ast.Print(self.builder, self.module, p[2], self.printf)
 
         @self.pg.production(f'expression : expression {t.SUM} expression')
         @self.pg.production(f'expression : expression {t.SUB} expression')
@@ -55,6 +65,10 @@ class Parser:
         @self.pg.production(f'expression : {t.DOUBLE}')
         def double(p):
             return aye_ast.Double(self.builder, self.module, p[0].value)
+
+        @self.pg.production(f'expression : {t.STRING}')
+        def string(p):
+            return aye_ast.String(self.builder, self.module, p[0].value)
 
         @self.pg.error
         def error_handle(token):

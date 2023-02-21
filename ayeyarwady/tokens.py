@@ -1,6 +1,7 @@
 # Types
 INTEGER = 'INTEGER'
 DOUBLE = 'DOUBLE'
+STRING = 'STRING'
 
 # Keywords
 PRINT = 'PRINT'

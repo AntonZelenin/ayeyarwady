@@ -24,8 +24,9 @@ class Lexer:
         self.lexer.add(t.SUB, r'\\')
 
         # Types
-        self.lexer.add(t.DOUBLE, r'-?\d+.\d+')
+        self.lexer.add(t.DOUBLE, r'-?\d+\.\d+')
         self.lexer.add(t.INTEGER, r'-?\d+')
+        self.lexer.add(t.STRING, '(""".?""")|(".?")|(\'.?\')')
 
         # Ignore spaces
         # maybe [\t\r\n\f\s]+ ?
