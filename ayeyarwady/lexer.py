@@ -20,8 +20,8 @@ class Lexer:
         # Operators
         self.lexer.add(t.SUM, r'\+')
         self.lexer.add(t.SUB, r'\-')
-        self.lexer.add(t.SUB, r'\*')
-        self.lexer.add(t.SUB, r'\\')
+        self.lexer.add(t.MUL, r'\*')
+        self.lexer.add(t.DIV, r'\/')
 
         # Types
         self.lexer.add(t.DOUBLE, r'-?\d+\.\d+')

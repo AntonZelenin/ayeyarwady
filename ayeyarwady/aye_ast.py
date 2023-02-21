@@ -78,7 +78,8 @@ class Mul(BinaryOp):
 
 class Div(BinaryOp):
     def eval(self):
-        return self.builder.div(self.left.eval(), self.right.eval())
+        # todo div and mul for different types
+        return self.builder.sdiv(self.left.eval(), self.right.eval())
 
 
 class Print:
